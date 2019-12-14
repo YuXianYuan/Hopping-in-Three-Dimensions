@@ -1,0 +1,208 @@
+#VRML_SIM R2019b utf8
+WorldInfo {
+  basicTimeStep 2
+}
+Viewpoint {
+  orientation -0.07736910332256083 -0.9914392687548048 -0.10517698522966393 1.9380946256939533
+  position -8.51813639099861 2.92496029934955 -1.428711349589706
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 6 9
+  floorTileSize 1.5 1.5
+  wallHeight 0.001
+}
+Robot {
+  translation 0 0.8 0
+  children [
+    DEF body Shape {
+      appearance PBRAppearance {
+        baseColorMap ImageTexture {
+          url [
+            "textures/water.jpg"
+          ]
+        }
+        metalness 0
+      }
+      geometry Cylinder {
+        height 0.1
+        radius 0.6
+      }
+      castShadows FALSE
+    }
+    Hinge2Joint {
+      jointParameters HingeJointParameters {
+      }
+      jointParameters2 JointParameters {
+      }
+      device [
+        RotationalMotor {
+          name "X rotational motor"
+          maxTorque 1000
+        }
+        PositionSensor {
+          name "X position sensor"
+        }
+      ]
+      device2 [
+        RotationalMotor {
+          name "Z rotational motor"
+          maxTorque 1000
+        }
+        PositionSensor {
+          name "Z position sensor"
+        }
+      ]
+      endPoint Solid {
+        translation -4.774731476976284e-13 0.00022956194274170732 -1.2420957273116862e-20
+        children [
+          DEF shaft Shape {
+            appearance PBRAppearance {
+              baseColor 0 0 1
+              metalness 0
+            }
+            geometry Cylinder {
+              height 0.3
+              radius 0.05
+            }
+            castShadows FALSE
+          }
+          SliderJoint {
+            jointParameters JointParameters {
+              axis 0 1 0
+              minStop -0.4
+              dampingConstant 10
+              staticFriction 0.2
+            }
+            device [
+              LinearMotor {
+                maxForce 1600
+              }
+              PositionSensor {
+              }
+            ]
+            endPoint Solid {
+              children [
+                DEF leg Shape {
+                  appearance PBRAppearance {
+                    baseColor 1 1 0
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 1.58
+                    radius 0.02
+                  }
+                  castShadows FALSE
+                }
+                Transform {
+                  translation 0 -0.77 0
+                  children [
+                    DEF foot Shape {
+                      appearance PBRAppearance {
+                        baseColor 1 0 0
+                        metalness 0
+                      }
+                      geometry Sphere {
+                        radius 0.03
+                        subdivision 3
+                      }
+                      castShadows FALSE
+                    }
+                    TouchSensor {
+                      boundingObject USE foot
+                      physics Physics {
+                      }
+                    }
+                  ]
+                }
+              ]
+              boundingObject USE leg
+              physics Physics {
+                density -1
+                mass 1
+              }
+            }
+          }
+        ]
+        boundingObject USE shaft
+        physics Physics {
+          density -1
+          mass 0.5
+        }
+      }
+    }
+    InertialUnit {
+      boundingObject USE body
+      physics Physics {
+        density -1
+        mass 0.5
+      }
+    }
+  ]
+  boundingObject USE body
+  physics Physics {
+    density -1
+    mass 15
+  }
+  controller "hopping_in_three_Dimensions"
+}
+Robot {
+  translation 0 2.4899999999999998 -0.86
+  children [
+    DEF externBody Shape {
+      geometry Sphere {
+        radius 0.1
+      }
+      castShadows FALSE
+    }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position 0.2
+      }
+      endPoint Solid {
+        translation 0 -1.4700998667619418 -0.29800399619260787
+        rotation 1 0 0 0.1999999999999989
+        children [
+          DEF externBall Shape {
+            appearance PBRAppearance {
+              roughness 0.5
+            }
+            geometry Sphere {
+              radius 0.2
+              subdivision 3
+            }
+            castShadows FALSE
+          }
+          Transform {
+            translation 0 0.75 0
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor 1 0 0
+                  roughness 0.5
+                  metalness 0
+                  IBLStrength 2
+                }
+                geometry Cylinder {
+                  height 1.5
+                  radius 0.01
+                }
+                castShadows FALSE
+              }
+            ]
+          }
+        ]
+        boundingObject USE externBall
+        physics Physics {
+          density -1
+          mass 2
+        }
+      }
+    }
+  ]
+  name "robot(1)"
+  boundingObject USE externBody
+}
