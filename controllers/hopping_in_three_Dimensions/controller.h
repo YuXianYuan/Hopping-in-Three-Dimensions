@@ -55,33 +55,34 @@ typedef struct
   double              k_leg_p;                //腿部控制时的kp
   double              k_leg_v;                //腿部控制时的kv
   //------------------------------------------------------------------------状态区
-  eulerAngleTypeDef   eulerAngle;          //欧拉角，Roll,Pitch,Yaw
-  eulerAngleTypeDef   eulerAngle_dot;      //欧拉角的导数，Roll,Pitch,Yaw
-  matTypeDef          R_H_B;               //从{B}坐标系到{H}坐标系的转换
-  matTypeDef          R_B_H;               //从{H}坐标系到{B}坐标系的转换
+  eulerAngleTypeDef   eulerAngle;             //欧拉角，Roll,Pitch,Yaw
+  eulerAngleTypeDef   eulerAngle_dot;         //欧拉角的导数，Roll,Pitch,Yaw
+  matTypeDef          R_H_B;                  //从{B}坐标系到{H}坐标系的转换
+  matTypeDef          R_B_H;                  //从{H}坐标系到{B}坐标系的转换
   
-  jointSpaceTypeDef   jointPoint;          //关节空间
-  jointSpaceTypeDef   jointPoint_dot;      //关节空间的导数
-  matTypeDef          workPoint_B;         //{B}坐标系工作空间
-  matTypeDef          workPoint_H;         //{H}坐标系工作空间
-  matTypeDef          workPoint_B_desire;  //{B}坐标系工作空间期望值
-  matTypeDef          workPoint_H_desire;  //{H}坐标系工作空间期望值
+  jointSpaceTypeDef   jointPoint;             //关节空间
+  jointSpaceTypeDef   jointPoint_dot;         //关节空间的导数
+  matTypeDef          workPoint_B;            //{B}坐标系工作空间
+  matTypeDef          workPoint_H;            //{H}坐标系工作空间
+  matTypeDef          workPoint_B_desire;     //{B}坐标系工作空间期望值
+  matTypeDef          workPoint_H_desire;     //{H}坐标系工作空间期望值
   
-  bool                is_foot_touching;    //足底是否触地
-  double              Ts;                  //上一个支撑相持续时间
-  double              x_dot;               //机身x方向水平速度
-  double              z_dot;               //机身z方向水平速度
-  double              x_dot_desire;        //机身x方向期望水平速度
-  double              z_dot_desire;        //机身z方向期望水平速度
-  int                 system_ms;           //从仿真启动开始的计时器
-  stateMachineTypeDef stateMachine;        //状态机
+  bool                is_foot_touching;       //足底是否触地
+  double              Ts;                     //上一个支撑相持续时间
+  double              x_dot;                  //机身x方向水平速度
+  double              z_dot;                  //机身z方向水平速度
+  double              x_dot_desire;           //机身x方向期望水平速度
+  double              z_dot_desire;           //机身z方向期望水平速度
+  int                 system_ms;              //从仿真启动开始的计时器
+  stateMachineTypeDef stateMachine;           //状态机
 }robotTypeDef;
 //-----------------------------------------------------------extern
 extern robotTypeDef robot;
-extern void robot_init();
-extern void updateRobotState();
-extern void robot_control();
-extern void robot_free();
+
+extern void robot_init           ();
+extern void updateRobotState     ();
+extern void robot_control        ();
+extern void robot_free           ();
 
 #endif
 

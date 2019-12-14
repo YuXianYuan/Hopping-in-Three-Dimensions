@@ -57,12 +57,12 @@ void robot_init()
   easyMat_eye(&robot.R_B_H);             
   //关节空间
   robot.jointPoint.r                 = 0.8;
-  robot.jointPoint.X_motor_angle     = 0;
-  robot.jointPoint.Z_motor_angle     = 0;
+  robot.jointPoint.X_motor_angle     = 0  ;
+  robot.jointPoint.Z_motor_angle     = 0  ;
   //关节空间的导数
-  robot.jointPoint_dot.r             = 0;
-  robot.jointPoint_dot.X_motor_angle = 0;
-  robot.jointPoint_dot.Z_motor_angle = 0;
+  robot.jointPoint_dot.r             = 0  ;
+  robot.jointPoint_dot.X_motor_angle = 0  ;
+  robot.jointPoint_dot.Z_motor_angle = 0  ;
   //{B}坐标系工作空间
   easyMat_create(&robot.workPoint_B, 3, 1);
   easyMat_clear(&robot.workPoint_B);

@@ -239,3 +239,4 @@ void easyMat_inv(matTypeDef* dstMat, matTypeDef* srcMat)
 {
   //code
 }
+
