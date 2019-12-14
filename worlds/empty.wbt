@@ -3,8 +3,8 @@ WorldInfo {
   basicTimeStep 2
 }
 Viewpoint {
-  orientation -0.07736910332256083 -0.9914392687548048 -0.10517698522966393 1.9380946256939533
-  position -8.51813639099861 2.92496029934955 -1.428711349589706
+  orientation -0.09611085734320442 -0.9840550989687903 -0.14966050011368556 2.05461836980195
+  position -8.425043882467596 3.4445796149208614 -3.1572885535897495
 }
 TexturedBackground {
 }
@@ -57,7 +57,7 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation -4.774731476976284e-13 0.00022956194274170732 -1.2420957273116862e-20
+        translation -6.347342090529398e-13 0.00022956194274170732 -1.2420957273116862e-20
         children [
           DEF shaft Shape {
             appearance PBRAppearance {
@@ -163,7 +163,7 @@ Robot {
         position 0.2
       }
       endPoint Solid {
-        translation 0 -1.4700998667619418 -0.29800399619260787
+        translation 0 -1.4700998667619547 -0.2980039961926106
         rotation 1 0 0 0.1999999999999989
         children [
           DEF externBall Shape {
