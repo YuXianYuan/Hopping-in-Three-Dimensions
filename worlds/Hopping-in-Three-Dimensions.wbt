@@ -3,8 +3,8 @@ WorldInfo {
   basicTimeStep 2
 }
 Viewpoint {
-  orientation -0.09611085734320442 -0.9840550989687903 -0.14966050011368556 2.05461836980195
-  position -8.425043882467596 3.4445796149208614 -3.1572885535897495
+  orientation -0.08681589431856875 -0.9917155161517698 -0.0946748938076826 1.7282180215447496
+  position -9.536441476802999 2.5591922762460135 -0.8168026599974252
 }
 TexturedBackground {
 }
@@ -57,7 +57,7 @@ Robot {
         }
       ]
       endPoint Solid {
-        translation -6.347342090529398e-13 0.00022956194274170732 -1.2420957273116862e-20
+        translation -6.338899952279346e-13 0.00022956194274170732 -1.2420957273116862e-20
         children [
           DEF shaft Shape {
             appearance PBRAppearance {
@@ -150,7 +150,7 @@ Robot {
   controller "hopping_in_three_Dimensions"
 }
 Robot {
-  translation 0 2.4899999999999998 -0.86
+  translation 0 2.49 -0.86
   children [
     DEF externBody Shape {
       geometry Sphere {
@@ -163,7 +163,7 @@ Robot {
         position 0.2
       }
       endPoint Solid {
-        translation 0 -1.4700998667619547 -0.2980039961926106
+        translation 0 -1.4701 -0.298004
         rotation 1 0 0 0.1999999999999989
         children [
           DEF externBall Shape {
