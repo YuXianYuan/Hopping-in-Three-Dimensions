@@ -1,0 +1,132 @@
+#VRML_SIM R2022b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Copper.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Fabric.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Leather.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Plastic.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.2794065172357339 -0.12946558639539515 0.9514045722328088 3.9106646221123498
+  position 4.836008147578883 4.873722996314339 4.6072983575388875
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 100 100
+}
+DEF hopping Robot {
+  translation 0 0 1.19
+  children [
+    InertialUnit {
+      name "imu"
+    }
+    Hinge2Joint {
+      jointParameters HingeJointParameters {
+      }
+      jointParameters2 JointParameters {
+        axis 0 1 0
+      }
+      device [
+        DEF x_sensor PositionSensor {
+          name "x_sensor"
+        }
+        DEF x_motor RotationalMotor {
+          name "x_motor"
+        }
+      ]
+      device2 [
+        DEF y_motor RotationalMotor {
+          name "y_motor"
+        }
+        DEF y_sensor PositionSensor {
+          name "y_sensor"
+        }
+      ]
+      endPoint Solid {
+        children [
+          SliderJoint {
+            jointParameters JointParameters {
+              dampingConstant 10
+              staticFriction 0.2
+            }
+            device [
+              DEF z_sensor PositionSensor {
+                name "z_sensor"
+              }
+              DEF z_motor LinearMotor {
+                name "z_motor"
+                maxForce 1600
+              }
+            ]
+            endPoint Solid {
+              children [
+                Transform {
+                  translation 0 0 -0.77
+                  children [
+                    DEF foot_sensor TouchSensor {
+                      children [
+                        DEF Foot Shape {
+                          appearance Plastic {
+                          }
+                          geometry Sphere {
+                            radius 0.03
+                            subdivision 3
+                          }
+                        }
+                      ]
+                      name "foot_sensor"
+                      boundingObject USE Foot
+                      physics Physics {
+                        mass 0.05
+                      }
+                    }
+                  ]
+                }
+                DEF Leg Shape {
+                  appearance Leather {
+                  }
+                  geometry Cylinder {
+                    height 1.58
+                    radius 0.02
+                  }
+                }
+              ]
+              boundingObject USE Leg
+              physics Physics {
+                mass 1
+              }
+            }
+          }
+          DEF Shaft Shape {
+            appearance Fabric {
+            }
+            geometry Cylinder {
+              height 0.3
+              radius 0.05
+            }
+          }
+        ]
+      }
+    }
+    DEF Body Shape {
+      appearance Copper {
+      }
+      geometry Cylinder {
+        height 0.1
+        radius 0.6
+      }
+    }
+  ]
+  boundingObject USE Body
+  physics Physics {
+    mass 15
+  }
+  controller "hopping_controller"
+}
