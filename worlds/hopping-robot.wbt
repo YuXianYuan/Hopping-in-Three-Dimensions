@@ -9,10 +9,11 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2022b/projects/appearances/protos/Plastic.proto"
 
 WorldInfo {
+  basicTimeStep 4
 }
 Viewpoint {
-  orientation -0.2794065172357339 -0.12946558639539515 0.9514045722328088 3.9106646221123498
-  position 4.836008147578883 4.873722996314339 4.6072983575388875
+  orientation -0.15089595025496771 -0.09115329598732554 0.9843380968078485 4.163321537287796
+  position 2.07621107359368 3.3631261310921365 1.7635806912513083
 }
 TexturedBackground {
 }
@@ -22,7 +23,7 @@ RectangleArena {
   floorSize 100 100
 }
 DEF hopping Robot {
-  translation 0 0 1.19
+  translation 0 0 0.79
   children [
     InertialUnit {
       name "imu"
@@ -50,9 +51,11 @@ DEF hopping Robot {
         }
       ]
       endPoint Solid {
+        rotation 0 1 0 0
         children [
           SliderJoint {
             jointParameters JointParameters {
+              minStop -0.4
               dampingConstant 10
               staticFriction 0.2
             }
@@ -113,6 +116,10 @@ DEF hopping Robot {
             }
           }
         ]
+        boundingObject USE Shaft
+        physics Physics {
+          mass 0.5
+        }
       }
     }
     DEF Body Shape {

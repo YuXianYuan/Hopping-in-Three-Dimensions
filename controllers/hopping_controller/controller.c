@@ -16,6 +16,14 @@
 #include "easyMat.h"
 #include "controller.h"
 
+const char* state_name[] = {
+    "LOADING",
+    "COMPRESSION",
+    "THRUST",
+    "UNLOADING",
+    "FLIGHT"
+};
+
 robotTypeDef robot;
 //----------------------------------------------------------declaration
 void updateRobotStateMachine();
@@ -29,14 +37,14 @@ void update_xy_dot_desire();
 void robot_init()
 {
     //------------------------------------------------------------------------参数区
-    robot.spring_normal_length = 0.9; //弹簧原长
+    robot.spring_normal_length = 1.0; //弹簧原长
     robot.v = 0.20;                   //机器人水平运动速度
-    robot.r_threshold = 0.80;         //用于状态机切换的腿长阈值系数
-    robot.k_spring = 2000.0;            //弹簧刚度
-    robot.F_thrust = 100.0;           // THRUST推力，用于调节跳跃高度
+    robot.r_threshold = 0.90;         //用于状态机切换的腿长阈值系数
+    robot.k_spring = 2500.0;          //弹簧刚度
+    robot.F_thrust = 150.0;           // THRUST推力，用于调节跳跃高度
     robot.k_leg_p = 6;                //腿部控制时的kp
     robot.k_leg_v = 0.8;              //腿部控制时的kv
-    robot.k_xy_dot = 0.072;           //净加速度系数
+    robot.k_xy_dot = 0.08;           //净加速度系数
     robot.k_pose_p = 0.8;             //姿态控制时的kp
     robot.k_pose_v = 0.025;           //姿态控制时的kv
 
@@ -92,7 +100,7 @@ void robot_init()
     robot.x_dot_desire = 0;        //机身x方向期望水平速度
     robot.y_dot_desire = 0;        //机身z方向期望水平速度
     robot.system_ms = 0;           //从仿真启动开始的计时器
-    robot.stateMachine = FLIGHT;   //状态机
+    robot.stateMachine = LOADING;  //状态机
 }
 /*
 机器人内存空间释放
@@ -132,9 +140,16 @@ void updateRobotState()
 
     printf("imu rpy %f %f %f, ", now_IMU.roll, now_IMU.pitch, now_IMU.yaw);
 
+    //一阶低通滤波器
     robot.eulerAngle_dot.roll = robot.eulerAngle_dot.roll * 0.5 + now_IMU_dot.roll * 0.5;
     robot.eulerAngle_dot.pitch = robot.eulerAngle_dot.pitch * 0.5 + now_IMU_dot.pitch * 0.5;
     robot.eulerAngle_dot.yaw = robot.eulerAngle_dot.yaw * 0.5 + now_IMU_dot.yaw * 0.5;
+
+    //printf("dot rpy %f %f %f, ", 
+    //    robot.eulerAngle_dot.roll, 
+    //    robot.eulerAngle_dot.pitch, 
+    //    robot.eulerAngle_dot.yaw
+    //);
 
     easyMat_RPY(&robot.R_H_B, robot.eulerAngle.roll, robot.eulerAngle.pitch, robot.eulerAngle.yaw);
     easyMat_trans(&robot.R_B_H, &robot.R_H_B);
@@ -169,9 +184,7 @@ void updateRobotState()
     /*更新状态机*/
     updateRobotStateMachine();
 
-    printf("state %d", robot.stateMachine);
-
-    printf("\n");
+    printf("state %s ", state_name[robot.stateMachine]);
 }
 /*
 机器人控制
@@ -186,13 +199,14 @@ void robot_control()
         F_spring += robot.F_thrust;
     }
 
-    printf("spring force %f\n", F_spring);
+    printf("spring force %f, ", -F_spring);
     set_spring_force(F_spring);
 
     /*控制臀部扭矩力*/
     // LOADING和UNLOADING时候，扭矩为0
     if ((robot.stateMachine == LOADING) || (robot.stateMachine == UNLOADING))
     {
+        printf("motor torque %f %f, ", 0, 0);
         set_X_torque(0);
         set_Y_torque(0);
     }
@@ -203,8 +217,11 @@ void robot_control()
         Tx = -(-robot.k_pose_p * robot.eulerAngle.roll - robot.k_pose_v * robot.eulerAngle_dot.roll);
         Ty = -(-robot.k_pose_p * robot.eulerAngle.pitch - robot.k_pose_v * robot.eulerAngle_dot.pitch);
 
+        printf("motor torque %f %f, ", Tx, Ty);
         set_X_torque(Tx);
         set_Y_torque(Ty);
+        //set_X_torque(0);
+        //set_Y_torque(0);
     }
     // FLIGHT的时候，控制足底移动到落足点
     if (robot.stateMachine == FLIGHT)
@@ -215,11 +232,12 @@ void robot_control()
 
         double x_f = robot.x_dot * robot.Ts / 2.0 + robot.k_xy_dot * (robot.x_dot - robot.x_dot_desire);
         double y_f = robot.y_dot * robot.Ts / 2.0 + robot.k_xy_dot * (robot.y_dot - robot.y_dot_desire);
-        double z_f = -sqrt(r * r - x_f * x_f - y_f * y_f);
+        double z_f = sqrt(r * r - x_f * x_f - y_f * y_f);
 
         robot.workPoint_H_desire.data[0][0] = x_f;
         robot.workPoint_H_desire.data[1][0] = y_f;
         robot.workPoint_H_desire.data[2][0] = z_f;
+
         //转到{B}坐标系下
         easyMat_mult(&robot.workPoint_B_desire, &robot.R_B_H, &robot.workPoint_H_desire);
 
@@ -227,8 +245,10 @@ void robot_control()
         double x_f_B = robot.workPoint_H_desire.data[0][0];
         double y_f_B = robot.workPoint_H_desire.data[1][0];
         double z_f_B = robot.workPoint_H_desire.data[2][0];
-        double x_angle_desire = atan(y_f_B / y_f_B) * 180.0 / PI;
+        double x_angle_desire = atan(y_f_B / z_f_B) * 180.0 / PI;
         double y_angle_desire = asin(x_f_B / r) * 180.0 / PI;
+
+        printf("foot des %f %f %f, ", x_f_B, y_f_B, z_f_B);
 
         //控制关节角
         double x_angle = robot.jointPoint.X_motor_angle;
@@ -239,8 +259,11 @@ void robot_control()
         Tx = -robot.k_leg_p * (x_angle - x_angle_desire) - robot.k_leg_v * x_angle_dot;
         Ty = -robot.k_leg_p * (y_angle - y_angle_desire) - robot.k_leg_v * y_angle_dot;
 
+        printf("motor torque %f %f, ", Tx, Ty);
         set_X_torque(Tx);
         set_Y_torque(Ty);
+        //set_X_torque(0);
+        //set_Y_torque(0);
     }
 }
 /*
@@ -310,10 +333,10 @@ void update_xy_dot()
 
     //转换到{H}坐标系下
     double pre_x = robot.workPoint_H.data[0][0];
-    double pre_y = robot.workPoint_H.data[2][0];
+    double pre_y = robot.workPoint_H.data[1][0];
     easyMat_mult(&robot.workPoint_H, &robot.R_H_B, &robot.workPoint_B);
     double now_x = robot.workPoint_H.data[0][0];
-    double now_y = robot.workPoint_H.data[2][0];
+    double now_y = robot.workPoint_H.data[1][0];
 
     //求导
     double now_x_dot = -(now_x - pre_x) / (0.001 * TIME_STEP);
@@ -332,6 +355,8 @@ void update_xy_dot()
         robot.x_dot = now_x_dot;
         robot.y_dot = now_y_dot;
     }
+
+    printf("robot speed %f, %f, ", robot.x_dot, robot.y_dot);
 }
 
 /*
@@ -396,6 +421,12 @@ void forwardKinematics(matTypeDef *workPoint, jointSpaceTypeDef *jointPoint)
     double r = jointPoint->r;
 
     workPoint->data[0][0] = r * sin(Ty);
-    workPoint->data[1][0] = -r * cos(Ty) * cos(Tx);
-    workPoint->data[2][0] = -r * cos(Ty) * sin(Tx);
+    workPoint->data[1][0] = r * cos(Ty) * sin(Tx);
+    workPoint->data[2][0] = r * cos(Ty) * cos(Tx);
+
+    printf("fk %f %f %f, ", 
+        workPoint->data[0][0],
+        workPoint->data[1][0],
+        workPoint->data[2][0]
+    );
 }

@@ -60,6 +60,8 @@ int main(int argc, char **argv)
          * wb_motor_set_position(my_actuator, 10.0);
          */
         robot_control();    //机器人控制
+
+        printf("\n");
     };
 
     /* Enter your cleanup code here */
