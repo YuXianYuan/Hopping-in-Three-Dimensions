@@ -38,13 +38,14 @@ void robot_init()
 {
     //------------------------------------------------------------------------参数区
     robot.spring_normal_length = 1.0; //弹簧原长
-    robot.v = 0.20;                   //机器人水平运动速度
+    robot.v = 0.10;                   //机器人水平运动速度
     robot.r_threshold = 0.90;         //用于状态机切换的腿长阈值系数
     robot.k_spring = 2500.0;          //弹簧刚度
-    robot.F_thrust = 150.0;           // THRUST推力，用于调节跳跃高度
+    robot.F_thrust = 200.0;           // THRUST推力，用于调节跳跃高度
     robot.k_leg_p = 6;                //腿部控制时的kp
     robot.k_leg_v = 0.8;              //腿部控制时的kv
-    robot.k_xy_dot = 0.08;           //净加速度系数
+    robot.k_x_dot = 0.05;           //净加速度系数
+    robot.k_y_dot = 0.08;           //净加速度系数
     robot.k_pose_p = 0.8;             //姿态控制时的kp
     robot.k_pose_v = 0.025;           //姿态控制时的kv
 
@@ -230,8 +231,8 @@ void robot_control()
         //计算落足点
         double r = robot.jointPoint.r;
 
-        double x_f = robot.x_dot * robot.Ts / 2.0 + robot.k_xy_dot * (robot.x_dot - robot.x_dot_desire);
-        double y_f = robot.y_dot * robot.Ts / 2.0 + robot.k_xy_dot * (robot.y_dot - robot.y_dot_desire);
+        double x_f = robot.x_dot * robot.Ts / 2.0 + robot.k_x_dot * (robot.x_dot - robot.x_dot_desire);
+        double y_f = robot.y_dot * robot.Ts / 2.0 + robot.k_y_dot * (robot.y_dot - robot.y_dot_desire);
         double z_f = sqrt(r * r - x_f * x_f - y_f * y_f);
 
         robot.workPoint_H_desire.data[0][0] = x_f;
@@ -334,7 +335,7 @@ void update_xy_dot()
     //转换到{H}坐标系下
     double pre_x = robot.workPoint_H.data[0][0];
     double pre_y = robot.workPoint_H.data[1][0];
-    easyMat_mult(&robot.workPoint_H, &robot.R_H_B, &robot.workPoint_B);
+    easyMat_mult(&robot.workPoint_H, &robot.R_B_H, &robot.workPoint_B);
     double now_x = robot.workPoint_H.data[0][0];
     double now_y = robot.workPoint_H.data[1][0];
 

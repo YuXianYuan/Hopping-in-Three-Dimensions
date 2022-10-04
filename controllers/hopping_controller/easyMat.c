@@ -222,8 +222,11 @@ void easyMat_RPY(matTypeDef *outRot, double roll, double pitch, double yaw)
     easyMat_rotY(&RotY, pitch);
     easyMat_rotZ(&RotZ, yaw);
 
+    //easyMat_mult(&temp, &RotY, &RotZ);
+    //easyMat_mult(outRot, &RotX, &temp);
+    //easyMat_mult(&temp, &RotY, &RotZ);
     easyMat_mult(&temp, &RotZ, &RotY);
-    easyMat_mult(outRot, &RotX, &temp);
+    easyMat_mult(outRot, &temp, &RotX);
 
     easyMat_free(&RotX);
     easyMat_free(&RotY);

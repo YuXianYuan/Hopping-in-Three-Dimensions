@@ -47,7 +47,8 @@ typedef struct
     double spring_normal_length; //*弹簧原长
     double k_spring;             //弹簧刚度
     double F_thrust;             // THRUST推力
-    double k_xy_dot;             //净加速度系数
+    double k_x_dot;             //净加速度系数
+    double k_y_dot;             //净加速度系数
     double r_threshold;          //状态机在脱离LOADING和进入UNLOADING状态时，腿长阈值判断
     double v;                    //机器人水平运动速度
     double k_pose_p;             //姿态控制时的kp
